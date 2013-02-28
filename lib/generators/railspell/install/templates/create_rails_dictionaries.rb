@@ -2,6 +2,8 @@ class CreateRailsDictionaries < ActiveRecord::Migration
   def self.up
     create_table :rails_dictionaries do |t|
       t.string  :name
+      t.string :language , :default => "en"
+      t.integer :number_of_words , :default => 0
       t.timestamps
     end
   end

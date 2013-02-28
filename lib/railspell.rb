@@ -1,26 +1,29 @@
-module RailsSpell
+module RSpell
+
+  def check(word)
+    # TODO: implement with GNU aspell
+    true
+  end 
+
   class RailsDictionary < ActiveRecord::Base
 
     # Usage:
-    # RailsDictionary.create :name => "MyOwnDictionary:::en:::150"
-    
+    # -----
+    # RailsDictionary.create :name => "MyOwnDictionary" , [:language => "en" , :number_of_words => 5]
+    #
+    # RailsDictionary.activate("MyOwnDictionary") 
+    # RSpell.check "vertizon" # => false
+    #
+    # RailsDictionary.add_words ["MyRulesMyWorld","Unpossible","Babystander","vertizon"] 
+    # 
+    # RSpell.check "vertizon" # => true
+    #
+    # RailsDictionary.remove_word "Unpossible"
+    # RailsDictionary.add_word "Thou'"
+    #
+    # RailsDictionary.deactivate("MyOwnDictionary") 
+
     has_many :rails_dictionary_words
-    def make_default
-    end
-
-    # Using ':::' as template
-    # format 'name:::language:::number_of_word'
-    def dict_name
-      self.name.gsub(":::").first
-    end 
-
-    def language
-      self.name.gsub(":::").second
-    end 
-
-    def number_of_words
-      self.name.gsub(":::").third
-    end 
 
     def backup
       if File.exists?(dict_file)
@@ -47,13 +50,21 @@ module RailsSpell
       ".aspell.#{language}.pws"
     end
 
-    def load
-      backup 
-      create_dict
+    def self.activate(name)
+      rdict = self.find_by_name name 
+      unless rdict
+        raise "Unknown Dictionary: #{name} \n  Please create #{name} in RailsDictionary before using it"
+      end 
+      rdict.backup 
+      rdict.create_dict
     end 
 
-    def unload 
-      File.rename "#{dict_file}.bkp" , dict_file
+    def self.deactivate(name) 
+      rdict = self.find_by_name name 
+      unless rdict
+        raise "Unknown Dictionary: #{name} \n  Please create #{name} in RailsDictionary before using it"
+      end 
+      File.rename "#{rdict.dict_file}.bkp" , rdict.dict_file
     end 
 
     def add_word(word)
@@ -70,6 +81,18 @@ module RailsSpell
         dictionary_word.destroy
       end
       dictionary_word
+    end
+
+    def add_words(words)
+      words.each do |word|
+        add_word(word)
+      end 
+    end
+
+    def remove_words(words)
+      words.each do |word|
+        remove_word(word)
+      end
     end
 
   end 
