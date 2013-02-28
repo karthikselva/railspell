@@ -1,11 +1,21 @@
 module RSpell
 
-  def check(word)
-    # TODO: implement with GNU aspell
-    true
+  def self.check(word,ignore_case=true)
+    speller = Aspell.new("en_US")
+    speller.suggestion_mode = Aspell::NORMAL
+    speller.set_option("ignore-case", ignore_case.to_s)
+    speller.check word 
+  end 
+
+  def self.suggest(word,ignore_case=true)
+    speller = Aspell.new("en_US")
+    speller.suggestion_mode = Aspell::NORMAL
+    speller.set_option("ignore-case", ignore_case.to_s)
+    speller.suggest(word)
   end 
 
   class RailsDictionary < ActiveRecord::Base
+
 
     # Usage:
     # -----
