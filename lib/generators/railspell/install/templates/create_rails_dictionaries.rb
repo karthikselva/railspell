@@ -4,6 +4,7 @@ class CreateRailsDictionaries < ActiveRecord::Migration
       t.string  :name
       t.string :language , :default => "en"
       t.integer :number_of_words , :default => 0
+      t.boolean :is_active , :default => false
       t.timestamps
     end
   end
